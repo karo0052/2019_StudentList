@@ -1,14 +1,282 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Student List 2</title>
-    <link rel="stylesheet" href="studentlist.css" type="text/css">
-</head>
-<body>
-  <h1>Students 1991</h1>
-    
-  <script src="studentlist.js"></script>
-</body>
+    <link rel="stylesheet" href="studentlist.css" type="text/css" />
+    <style>
+      li:nth-of-type(even) {
+        background-color: rgba(199, 72, 72, 0.51);
+      }
+      li:nth-of-type(odd) {
+        background-color: rgba(201, 201, 201, 0.51);
+      }
+      li {
+        list-style: none;
+        padding: 10px;
+      }
+      ul {
+        padding: 0;
+      }
+      h2 {
+        margin: 0;
+      }
+
+      /* sort button */
+      .dropbtn {
+        background-color: #3498db;
+        color: white;
+        padding: 16px;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+      }
+
+      .dropbtn:hover,
+      .dropbtn:focus {
+        background-color: #2980b9;
+      }
+
+      .dropdown {
+        position: relative;
+        display: inline-block;
+      }
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f1f1f1;
+        min-width: 160px;
+        overflow: auto;
+        box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+        z-index: 1;
+      }
+
+      .dropdown-content p {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: block;
+      }
+
+      .dropdown:hover .dropdown-content {
+        display: block;
+      }
+
+      .dropdown-content p:hover {
+        background-color: #ddd;
+      }
+      .dropdown:hover .dropbtn {
+        background-color: #3e8e41;
+      }
+
+      .modal {
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        position: fixed;
+        overflow: scroll;
+        top: 0;
+        left: 0;
+        opacity: 0;
+        transition: 0.5s;
+        pointer-events: none;
+      }
+
+      .modal_content {
+        max-width: 80vw;
+        background-color: white;
+        padding: 15px;
+        overflow: hidden;
+      }
+
+      .show {
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .modal_open {
+        overflow: hidden;
+      }
+
+      .data-name {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Students 1991</h1>
+
+    <div class="dropdown">
+      <button class="dropbtn">Sort</button>
+      <div class="dropdown-content">
+        <p class="sort_button" data-sort="first">First name</p>
+        <p class="sort_button" data-sort="last">Last name</p>
+        <p class="sort_button" data-sort="house">House</p>
+      </div>
+    </div>
+
+    <div class="dropdown">
+      <button class="dropbtn">Filter</button>
+      <div class="dropdown-content">
+        <p class="filter_button" data-house="all">All</p>
+        <p class="filter_button" data-house="Hufflepuff">Hufflepuff</p>
+        <p class="filter_button" data-house="Gryffindor">Gryffindor</p>
+        <p class="filter_button" data-house="Ravenclaw">Ravenclaw</p>
+        <p class="filter_button" data-house="Slytherin">Slytherin</p>
+      </div>
+    </div>
+
+    <ul id="dest"></ul>
+    <template class="temp">
+      <li>
+        <h2 class="data-name"></h2>
+        <p class="data-house"></p>
+      </li>
+    </template>
+
+    <section class="modal">
+      <div class="modal_content">
+        <p class="close">X</p>
+        <img class="student_picture" src="" alt="" />
+        <h2></h2>
+        <div class="details">
+          <p class="details1"></p>
+          <p class="details2"></p>
+          <p class="details3"></p>
+        </div>
+        <img class="crest" src="" alt="" />
+      </div>
+    </section>
+    <script>
+      "use strict";
+
+      document.addEventListener("DOMContentLoaded", init);
+      let destination = document.querySelector("#dest");
+      let list;
+      let filter = "all"; //filtervariabel
+      let sort = "default"; //sorteringsvariabel
+      let modal = document.querySelector(".modal");
+      let closeModal = document.querySelector(".close");
+
+      function init() {
+        console.log("init");
+
+        hentJson();
+      }
+
+      async function hentJson() {
+        let dataJson = await fetch("students1991.json");
+        list = await dataJson.json();
+
+        // test = list.map(a => a.fullname);
+        // console.log(test);
+        // test2 = test[0].split(" ");
+        // console.log(test2);
+
+        // test.forEach(i => {
+        //   // console.log(i);
+        //   test2 = i.split(" ");
+        //   console.log(test2[1]);
+        // });
+
+        showList();
+      }
+
+      function filterStudentlist() {
+        console.log("filter");
+        destination.textContent = "";
+        filter = this.getAttribute("data-house");
+        console.log(filter);
+        showList();
+      }
+
+      function sortStudentlist() {
+        console.log("sort");
+        sort = this.getAttribute("data-sort");
+        console.log(sort);
+        destination.textContent = "";
+        if (sort == "first") {
+          console.log("første");
+
+          list.sort((a, b) => {
+            return a.fullname.localeCompare(b.fullname);
+          });
+        }
+        if (sort == "last") {
+          console.log("sidste");
+        }
+
+        if (sort == "house") {
+          console.log("hus");
+
+          list.sort((a, b) => {
+            return a.house.localeCompare(b.house);
+          });
+        }
+
+        showList();
+      }
+
+      function showList() {
+        console.log("show list");
+        document.querySelectorAll(".sort_button").forEach(knap => {
+          knap.addEventListener("click", sortStudentlist);
+        });
+        document.querySelectorAll(".filter_button").forEach(knap => {
+          knap.addEventListener("click", filterStudentlist);
+        });
+
+        let temp = document.querySelector(".temp");
+
+        list.forEach(student => {
+          if (filter == student.house || filter == "all") {
+            let klon = temp.cloneNode(true).content;
+            //indsæt data i html
+            klon.querySelector(".data-name").textContent = student.fullname;
+
+            klon.querySelector(".data-name").addEventListener("click", () => {
+              visModal(student);
+            });
+
+            klon.querySelector(".data-house").textContent = student.house;
+
+            //placer klon i html
+            destination.appendChild(klon);
+          }
+        });
+      }
+
+      function visModal(studenten) {
+        console.log("vis modal");
+        modal.classList.add("show");
+        document.querySelector("body").classList.add("modal_open");
+        // modal.querySelector(".student_picture").src = ;
+        // modal.querySelector(".student_picture").alt = ;
+        modal.querySelector("h2").innerHTML = studenten.fullname;
+
+        modal.querySelector(".details1").innerHTML = "Extra details 1";
+        modal.querySelector(".details2").innerHTML = "Extra details 2";
+        modal.querySelector(".details3").innerHTML = "Extra details 3";
+
+        modal.querySelector(".crest").src =
+          "images/" + studenten.house + ".png";
+        modal.querySelector(".crest").alt =
+          "Picture of " + studenten.house + "s crest.";
+
+        window.onclick = function(event) {
+          if (event.target == modal || event.target == closeModal) {
+            modal.classList.remove("show");
+            document.querySelector("body").classList.remove("modal_open");
+          }
+        };
+      }
+    </script>
+
+    <script src="studentlist.js"></script>
+  </body>
 </html>
