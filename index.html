@@ -156,12 +156,13 @@
       "use strict";
 
       document.addEventListener("DOMContentLoaded", init);
-      let destination = document.querySelector("#dest");
+      const destination = document.querySelector("#dest");
       let list;
       let filter = "all"; //filtervariabel
-      let sort = "default"; //sorteringsvariabel
-      let modal = document.querySelector(".modal");
-      let closeModal = document.querySelector(".close");
+      let sort; //sorteringsvariabel
+      const modal = document.querySelector(".modal");
+      const closeModal = document.querySelector(".close");
+      let test;
 
       function init() {
         console.log("init");
@@ -173,8 +174,18 @@
         let dataJson = await fetch("students1991.json");
         list = await dataJson.json();
 
-        // test = list.map(a => a.fullname);
-        // console.log(test);
+        test = list.map(a => a.fullname);
+        console.log(test);
+
+        let test2 = test.toString();
+        console.log(test2);
+
+        let test3 = test2.split(" ");
+        console.log(test3);
+
+        let test4 = test3.toString();
+        console.log(test4);
+
         // test2 = test[0].split(" ");
         // console.log(test2);
 
@@ -236,6 +247,9 @@
         list.forEach(student => {
           if (filter == student.house || filter == "all") {
             let klon = temp.cloneNode(true).content;
+
+            // student.firstname = ;
+
             //indsæt data i html
             klon.querySelector(".data-name").textContent = student.fullname;
 
@@ -255,7 +269,22 @@
         console.log("vis modal");
         modal.classList.add("show");
         document.querySelector("body").classList.add("modal_open");
-        // modal.querySelector(".student_picture").src = ;
+
+        const fullName = studenten.fullname;
+        console.log(fullName);
+        const space = fullName.indexOf(" ");
+        const lastName = fullName.slice(space + 1);
+        console.log(lastName);
+        const lastNameLower = lastName.toLowerCase();
+        console.log(lastNameLower);
+        const firstLetter = fullName.substring(0, 1);
+        console.log(firstLetter);
+        const firstLetterLower = firstLetter.toLowerCase();
+        console.log(firstLetterLower);
+
+        modal.querySelector(
+          ".student_picture"
+        ).src = `images/${lastNameLower}_${firstLetterLower}.png`;
         // modal.querySelector(".student_picture").alt = ;
         modal.querySelector("h2").innerHTML = studenten.fullname;
 
